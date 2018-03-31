@@ -18,3 +18,7 @@
   font-size: 29px !important;
   padding: 15px !important;
 }
+
+.btn-finish {
+  display: none !important;
+}

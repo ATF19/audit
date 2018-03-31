@@ -8,6 +8,7 @@ import Loading from "./Loading";
 import Services from "./Services";
 import Body from "./Body";
 import Personnel from "./Personnel";
+import Clause from "./Clause";
 
 var steps = [
   {
@@ -17,13 +18,15 @@ var steps = [
   {
     stepName: "Personnel",
     component: Personnel
+  },
+  {
+    stepName: "Clause",
+    component: Clause
   }
 ];
 
 
 export default class App extends Component {
-
-
 
   render() {
     return(
@@ -47,7 +50,6 @@ export default class App extends Component {
                         color="primary"
                         previousButtonText="Precedent"
                         nextButtonText="Suivant"
-                        finishButtonText="Terminer"
                     />
                 </Col>
             </Row>

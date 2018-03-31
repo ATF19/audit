@@ -16,4 +16,11 @@ export default class Service {
     .then(response => callback(response))
     ;
   }
+
+  getClauses(callback) {
+    fetch(Config.api+"/clauses")
+    .then(response => response.json())
+    .then(response => callback(response))
+    ;
+  }
 }
