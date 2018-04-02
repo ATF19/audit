@@ -23,4 +23,11 @@ export default class Service {
     .then(response => callback(response))
     ;
   }
+
+  getExigences(clause, responsables, callback) {
+    fetch(Config.api+"/exigences?clause="+clause+"&responsables="+responsables)
+    .then(response => response.json())
+    .then(response => callback(response))
+    ;
+  }
 }

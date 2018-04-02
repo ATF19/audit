@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -35,8 +32,24 @@ public class ExigenceController {
 
     @CrossOrigin
     @GetMapping("/exigences")
-    public List<Exigence> getAllExigences(HttpServletResponse response) {
-        List<Exigence> list = exigenceRepository.findAll();
+    public List<Exigence> getAllExigences(HttpServletResponse response,
+                                          @RequestParam(value = "responsables") Optional<List<Long>> responsablesIdsOptional,
+                                          @RequestParam(value = "clause") Optional<List<Long>> clausesIdsOptional) {
+
+        List<Exigence> list;
+
+
+        if(responsablesIdsOptional.isPresent() && clausesIdsOptional.isPresent()) {
+            List<Long> clausesIds = clausesIdsOptional.get();
+            List<Long> responsablesIds= responsablesIdsOptional.get();
+            List<Clause> clauses = clauseRepository.findAllById(clausesIds);
+            List<Responsable> responsables = responsableRepository.findAllById(responsablesIds);
+            list = exigenceRepository.findAllByClauseInAndResponsablesIn(clauses, responsables);
+
+        }
+        else {
+            list = exigenceRepository.findAll();
+        }
 
         /* This two headers are required in the admin-on-rest-client */
         response.addHeader("Access-Control-Expose-Headers", "X-Total-Count");
@@ -44,6 +57,7 @@ public class ExigenceController {
 
         return list;
     }
+
 
     @CrossOrigin
     @PostMapping("/exigences")

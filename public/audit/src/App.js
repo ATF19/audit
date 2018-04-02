@@ -9,6 +9,7 @@ import Services from "./Services";
 import Body from "./Body";
 import Personnel from "./Personnel";
 import Clause from "./Clause";
+import Exigence from "./Exigence";
 
 var steps = [
   {
@@ -22,6 +23,10 @@ var steps = [
   {
     stepName: "Clause",
     component: Clause
+  },
+  {
+    stepName: "Exigence",
+    component: Exigence
   }
 ];
 
