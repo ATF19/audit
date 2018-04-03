@@ -100,7 +100,8 @@ export default class Clause extends Component {
 
     var position = this.isChecked(clause);
     if(position > -1) {
-      clauses.splice(position, 1);    }
+      clauses.splice(position, 1);
+    }
     else {
       clauses.push(clause);
     }

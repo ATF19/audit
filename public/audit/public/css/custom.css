@@ -19,6 +19,17 @@
   padding: 15px !important;
 }
 
-.btn-finish {
+.btn-finish, .btn-previous {
   display: none !important;
+}
+
+.exigence_box {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  margin-bottom: 10px;
+}
+
+.vcenter {
+  display: flex;
+  align-items: center;
 }

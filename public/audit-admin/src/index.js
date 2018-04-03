@@ -6,6 +6,7 @@ import frenchMessages from 'aor-language-french';
 import { NormeList, NormeEdit, NormeCreate, NormeIcon } from './Normes';
 import { ClauseList, ClauseEdit, ClauseCreate, ClauseIcon } from './Clauses';
 import { UtilisateurList, UtilisateurEdit, UtilisateurCreate, UtilisateurIcon } from './Utilisateurs';
+import { AnalyseList, analyseIcon } from './Analyses';
 import { ExigenceList, ExigenceEdit, ExigenceCreate, ExigenceIcon } from './Exigences';
 import { ResponsableList, ResponsableEdit, ResponsableCreate, ResponsableIcon } from './Responsables';
 
@@ -33,6 +34,7 @@ render(
       <Resource name="exigences" list={ExigenceList} edit={ExigenceEdit} create={ExigenceCreate} remove={Delete} />
       <Resource name="responsables" list={ResponsableList} edit={ResponsableEdit} create={ResponsableCreate} remove={Delete} />
       <Resource name="utilisateurs" list={UtilisateurList} edit={UtilisateurEdit} create={UtilisateurCreate} remove={Delete} />
+      <Resource name="analyses" list={AnalyseList} />
     </Admin>,
     document.getElementById('root')
 );

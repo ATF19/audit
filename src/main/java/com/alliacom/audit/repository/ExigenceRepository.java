@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ExigenceRepository extends JpaRepository<Exigence, Long> {
-    List<Exigence> findAllByClauseInAndResponsablesIn(List<Clause> clause, List<Responsable> responsables);
+    List<Exigence> findDistinctByClauseInAndResponsablesIn(List<Clause> clause, List<Responsable> responsables);
 }
