@@ -17,6 +17,10 @@ const messages = {
     fr: frenchMessages,
 };
 
+if (!localStorage.getItem('token')) {
+	window.location.replace('#/login');
+}
+
 const httpClient = (url, options = {}) => {
     if (!options.headers) {
         options.headers = new Headers({ Accept: 'application/json' });
@@ -28,7 +32,7 @@ const httpClient = (url, options = {}) => {
 const restClient = jsonServerRestClient(Config.api, httpClient);
 
 render(
-    <Admin authClient={Auth} title="Alliacom audit" restClient={restClient} locale="fr" messages={messages}>
+    <Admin title="Alliacom audit" restClient={restClient} authClient={Auth} locale="fr" messages={messages}>
       <Resource name="normes" list={NormeList} edit={NormeEdit} create={NormeCreate} remove={Delete} />
       <Resource name="clauses" list={ClauseList} edit={ClauseEdit} create={ClauseCreate} remove={Delete} />
       <Resource name="exigences" list={ExigenceList} edit={ExigenceEdit} create={ExigenceCreate} remove={Delete} />

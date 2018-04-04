@@ -24,7 +24,6 @@ public class Utilisateur implements Serializable {
     @NotBlank
     private String password;
 
-    @NotBlank
     private String role = "simple"; // simple ou admin
 
     @Column(nullable = false, updatable = false)

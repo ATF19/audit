@@ -1,12 +1,12 @@
-import { AUTH_LOGIN } from 'admin-on-rest';
+import { AUTH_LOGIN, AUTH_LOGOUT } from 'admin-on-rest';
 import Config from "./Config";
 
 export default (type, params) => {
     if (type === AUTH_LOGIN) {
-        const { email, password } = params;
+        const { username, password } = params;
         const request = new Request(Config.api+"/utilisateurs/admin/login", {
             method: 'POST',
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email: username, password: password }),
             headers: new Headers({ 'Content-Type': 'application/json' }),
         })
         return fetch(request)
@@ -19,6 +19,10 @@ export default (type, params) => {
             .then(({ token }) => {
                 localStorage.setItem('token', token);
             });
+    }
+    if (type === AUTH_LOGOUT) {
+        localStorage.removeItem('token');
+        return Promise.resolve();
     }
     return Promise.resolve();
 }

@@ -111,7 +111,7 @@ export default class Clause extends Component {
     }
     else {
       selectedExigence.push({
-        ...exigence,
+        exigenceId: exigence.id,
         note: value
       });
     }

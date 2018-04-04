@@ -1,8 +1,11 @@
 package com.alliacom.audit.controller;
 
+import com.alliacom.audit.data.Token;
 import com.alliacom.audit.data.Utilisateur;
 import com.alliacom.audit.exception.ResourceNotFoundException;
+import com.alliacom.audit.repository.TokenRepository;
 import com.alliacom.audit.repository.UtilisateurRepository;
+import com.alliacom.audit.utilities.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,9 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -21,6 +23,9 @@ public class UtilisateurController {
 
     @Autowired
     UtilisateurRepository utilisateurRepository;
+
+    @Autowired
+    TokenRepository tokenRepository;
 
     @CrossOrigin
     @GetMapping("/utilisateurs")
@@ -86,10 +91,37 @@ public class UtilisateurController {
             }
         }
 
-        if(found)
-            return ResponseEntity.ok().build();
+        if(found) {
+            Map<String, String> responseObject = new HashMap<String ,String>();
 
-        return ResponseEntity.notFound().build();
+            TokenUtil tokenUtil = new TokenUtil();
+            String tokenString = tokenUtil.generate();
+            // Set the expire date
+            Date now = Date.from(Instant.now());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(now);
+            calendar.add(Calendar.DATE, 7);
+            Date expirationDate = calendar.getTime();
+
+            Utilisateur utilisateur = utilisateurRepository.findByEmailEquals(givenUtilisateur.getEmail());
+
+
+            Token token = new Token();
+            token.setUtilisateur(utilisateur);
+            token.setToken(tokenString);
+            token.setExpireDate(expirationDate);
+
+            tokenRepository.save(token);
+
+            responseObject.put("token", tokenString);
+            responseObject.put("utilisateurId", String.valueOf(utilisateur.getId()));
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Type", "application/json; charset=UTF-8");
+
+            return new ResponseEntity<Map<String, String>>(responseObject, headers, HttpStatus.OK);
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @CrossOrigin
@@ -110,9 +142,26 @@ public class UtilisateurController {
         if(found) {
             Map<String, String> responseObject = new HashMap<String ,String>();
 
-            // TODO
-            responseObject.put("token", "a");
+            TokenUtil tokenUtil = new TokenUtil();
+            String tokenString = tokenUtil.generate();
+            // Set the expire date
+            Date now = Date.from(Instant.now());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(now);
+            calendar.add(Calendar.DATE, 7);
+            Date expirationDate = calendar.getTime();
 
+            Utilisateur utilisateur = utilisateurRepository.findByEmailEquals(givenUtilisateur.getEmail());
+
+
+            Token token = new Token();
+            token.setUtilisateur(utilisateur);
+            token.setToken(tokenString);
+            token.setExpireDate(expirationDate);
+
+            tokenRepository.save(token);
+
+            responseObject.put("token", tokenString);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "application/json; charset=UTF-8");
 

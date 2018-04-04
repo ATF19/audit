@@ -32,7 +32,7 @@ export default class Body extends Component {
 
     						<div className="step" data-state="branchtype">
     							<div className="question_title">
-    								<h3>ChOISIR LA NORME</h3>
+    								<h3>CHOISIR LA NORME</h3>
     								<p>Selectionner la norme à utiliser pendant <strong>la consultation</strong>.</p>
     							</div>
 
@@ -69,5 +69,6 @@ export default class Body extends Component {
   selectNorme(norme) {
     this.setState({selectNorme: norme});
     window.selectedNorme = norme;
+    window.normeId = norme.id;
   }
 }
