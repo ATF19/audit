@@ -4,7 +4,7 @@ export default class Loading extends Component {
   render() {
     return(
       <div style={{marginTop: 30}}>
-        <div class="loader">
+        <div className="loader">
           <svg>
             <defs>
               <filter id="goo">

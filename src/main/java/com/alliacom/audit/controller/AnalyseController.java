@@ -10,6 +10,8 @@ import com.alliacom.audit.utilities.Rapport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -110,7 +113,13 @@ public class AnalyseController {
 
         analyseRepository.save(analyse);
 
-        return ResponseEntity.ok().build();
+
+        Map<String, String> responseObject = new HashMap<String ,String>();
+        responseObject.put("rapport", analyse.getRapport());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json; charset=UTF-8");
+
+        return new ResponseEntity<Map<String, String>>(responseObject, headers, HttpStatus.OK);
     }
 
 

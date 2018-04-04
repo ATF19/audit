@@ -28,6 +28,7 @@ public class SecurityFilter implements Filter {
         String requestUrl = httpServletRequest.getRequestURI();
         if(!requestUrl.equals("/api/utilisateurs/admin/login")
         && !requestUrl.equals("/api/utilisateurs/login")
+        && !requestUrl.startsWith("/api/rapports/")
         && !httpServletRequest.getMethod().equals("OPTIONS")) {
             if (authorization == null) {
                 httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);

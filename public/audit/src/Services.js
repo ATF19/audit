@@ -6,7 +6,7 @@ export default class Service {
     fetch(Config.api+"/normes", {
       headers: new Headers({
        'Authorization': 'Bearer '+ localStorage.getItem("token"),
-       'Content-Type': 'application/x-www-form-urlencoded'
+       'Content-Type': 'application/json'
      })
     })
     .then(response => response.json())
@@ -19,7 +19,7 @@ export default class Service {
     fetch(Config.api+"/responsables", {
       headers: new Headers({
        'Authorization': 'Bearer '+ localStorage.getItem("token"),
-       'Content-Type': 'application/x-www-form-urlencoded'
+       'Content-Type': 'application/json'
      })
     })
     .then(response => response.json())
@@ -31,7 +31,7 @@ export default class Service {
     fetch(Config.api+"/clauses", {
       headers: new Headers({
        'Authorization': 'Bearer '+ localStorage.getItem("token"),
-       'Content-Type': 'application/x-www-form-urlencoded'
+       'Content-Type': 'application/json'
      })
     })
     .then(response => response.json())
@@ -43,11 +43,29 @@ export default class Service {
     fetch(Config.api+"/exigences?clause="+clause+"&responsables="+responsables, {
       headers: new Headers({
        'Authorization': 'Bearer '+ localStorage.getItem("token"),
-       'Content-Type': 'application/x-www-form-urlencoded'
+       'Content-Type': 'application/json'
      })
     })
     .then(response => response.json())
     .then(response => callback(response))
+    ;
+  }
+
+  addAnalyse(utilisateurId, normeId, exigences, callback) {
+    fetch(Config.api+"/analyses", {
+      headers: new Headers({
+       'Authorization': 'Bearer '+ localStorage.getItem("token"),
+       'Content-Type': 'application/json'
+     }),
+     method: 'POST',
+     body: JSON.stringify({
+       normeId: parseInt(normeId),
+       utilisateurId: parseInt(utilisateurId),
+       exigences: exigences
+     })
+    })
+    .then(response => response.json())
+    .then(({ rapport }) => callback(rapport))
     ;
   }
 

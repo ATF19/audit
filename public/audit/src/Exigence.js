@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 
+import Config from "./Config";
 import Loading from "./Loading";
 import Services from "./Services";
 
@@ -10,7 +11,9 @@ export default class Clause extends Component {
     loading: true,
     exigences: [],
     selectedExigence: [],
-    loaded: false
+    loaded: false,
+    download: false,
+    rapport: ""
   }
 
 
@@ -46,7 +49,12 @@ export default class Clause extends Component {
 
     							{this.renderExigence()}
                   <div id="bottom-wizard">
-                    <button className="forward">Envoyer</button>
+                    {
+                      this.state.download ?
+                        <a className="forward" href={Config.api + "/rapports/" + this.state.rapport} target="_blank">Telecharger le rapport</a>
+                          :
+                        <button className="forward" onClick={this.envoyer.bind(this)}>Envoyer</button>
+                    }
                   </div>
     						</div>
 
@@ -60,7 +68,10 @@ export default class Clause extends Component {
   }
 
   renderExigence() {
+    if(this.state.download)
+      return [];
     var exigenceDom = [];
+
     this.state.exigences.map((exigence, i) => {
       exigenceDom.push(
         <div className="row justify-content-center" key={i}>
@@ -94,7 +105,7 @@ export default class Clause extends Component {
     var checkedPosition = -1;
     var exigences = this.state.selectedExigence;
     for(var i=0; i < exigences.length; i++) {
-      if(exigences[i].id == exigence.id) {
+      if(exigences[i].exigenceId == exigence.id) {
         checkedPosition = i;
         break;
       }
@@ -112,12 +123,26 @@ export default class Clause extends Component {
     else {
       selectedExigence.push({
         exigenceId: exigence.id,
-        note: value
+        note: parseInt(value)
       });
     }
     this.setState({selectedExigence: selectedExigence});
-    window.selectedExigence = selectedExigence;
-    console.log(selectedExigence);
   }
+
+  envoyer(e) {
+    e.preventDefault();
+    this.setState({loading: true});
+    var services = new Services();
+    services.addAnalyse(
+      localStorage.getItem("utilisateurId"),
+      window.normeId,
+      this.state.selectedExigence,
+      (rapport) => {
+        alert("Generé avec succes !");
+        this.setState({loading: false, download: true, rapport: rapport});
+      }
+    );
+  }
+
 
 }
