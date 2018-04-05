@@ -65,12 +65,14 @@ public class AnalyseController {
 
         Long normeId = new Long((Integer) body.get("normeId"));
         Long utilisateurId = new Long((Integer) body.get("utilisateurId"));
+        String graphe = (String) body.get("graphe");
 
         Norme norme = normeRepository.findById(normeId)
                 .orElse(null);
         Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
                 .orElse(null);
         String normeName = norme.getOrganisation()+" "+norme.getNumero();
+
 
         List<Map<String, Object>> exigences = (List<Map<String, Object>>) body.get("exigences");
 
@@ -104,6 +106,8 @@ public class AnalyseController {
                 .format(new Date());
 
         Rapport rapport = new Rapport(currentTime);
+        rapport.setGrapheBase64(graphe);
+        rapport.generateGrapheImage();
         String fileName = rapport.create(datas);
 
         Analyse analyse = new Analyse();

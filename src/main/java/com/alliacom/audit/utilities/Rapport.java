@@ -1,9 +1,7 @@
 package com.alliacom.audit.utilities;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +15,8 @@ public class Rapport {
     public static String RAPPORT_DIRECTORY = "./rapports/";
     private String file_name;
     private String file_name_without_path;
+    private String grapheBase64 = "";
+    private byte[] graphe;
 
     public Rapport(String name) {
         this.file_name_without_path = name + ".xls";
@@ -65,10 +65,24 @@ public class Rapport {
         /* --  Footer -- */
         Row footer = sheet.createRow(rowNumber++);
         int footerColNumber = 2;
+
         Cell cell1 = footer.createCell(footerColNumber++);
         cell1.setCellValue("SCORE TOTAL");
+
         Cell cell2 = footer.createCell(footerColNumber++);
         cell2.setCellValue(scoreTotal);
+
+        if(graphe.length > 0) {
+            int pictureId = workbook.addPicture(graphe, Workbook.PICTURE_TYPE_PNG);
+            Drawing drawing = sheet.createDrawingPatriarch();
+            CreationHelper creationHelper = workbook.getCreationHelper();
+            ClientAnchor clientAnchor = creationHelper.createClientAnchor();
+            clientAnchor.setCol1(5);
+            clientAnchor.setRow1(1);
+            Picture picture = drawing.createPicture(clientAnchor, pictureId);
+            picture.resize();
+        }
+
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_GREEN.getIndex());
         cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
@@ -95,4 +109,42 @@ public class Rapport {
     }
 
 
+    public void generateGrapheImage() {
+        String encodingPrefix = "base64,";
+        int contentStartIndex = grapheBase64.indexOf(encodingPrefix) + encodingPrefix.length();
+        byte[] imageData = Base64.decodeBase64(grapheBase64.substring(contentStartIndex));
+        graphe = imageData;
+    }
+
+    public static String getRapportDirectory() {
+        return RAPPORT_DIRECTORY;
+    }
+
+    public static void setRapportDirectory(String rapportDirectory) {
+        RAPPORT_DIRECTORY = rapportDirectory;
+    }
+
+    public String getFile_name() {
+        return file_name;
+    }
+
+    public void setFile_name(String file_name) {
+        this.file_name = file_name;
+    }
+
+    public String getFile_name_without_path() {
+        return file_name_without_path;
+    }
+
+    public void setFile_name_without_path(String file_name_without_path) {
+        this.file_name_without_path = file_name_without_path;
+    }
+
+    public String getGrapheBase64() {
+        return grapheBase64;
+    }
+
+    public void setGrapheBase64(String grapheBase64) {
+        this.grapheBase64 = grapheBase64;
+    }
 }

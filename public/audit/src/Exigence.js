@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import Radar from 'react-d3-radar';
+import domtoimage from 'dom-to-image';
 
 import Config from "./Config";
 import Loading from "./Loading";
@@ -11,6 +13,7 @@ export default class Clause extends Component {
     loading: true,
     exigences: [],
     selectedExigence: [],
+    graphData: [],
     loaded: false,
     download: false,
     rapport: ""
@@ -34,6 +37,7 @@ export default class Clause extends Component {
     }
   }
 
+
   render() {
     if(this.state.loading)
       return <Loading />
@@ -51,10 +55,13 @@ export default class Clause extends Component {
                   <div id="bottom-wizard">
                     {
                       this.state.download ?
-                        <a className="forward" href={Config.api + "/rapports/" + this.state.rapport} target="_blank">Telecharger le rapport</a>
+                        <div>
+                          <a className="col-12 text-center forward" href={Config.api + "/rapports/" + this.state.rapport} target="_blank">Telecharger le rapport</a>
+                        </div>
                           :
                         <button className="forward" onClick={this.envoyer.bind(this)}>Envoyer</button>
                     }
+                      {this.renderRadar()}
                   </div>
     						</div>
 
@@ -115,33 +122,93 @@ export default class Clause extends Component {
 
   selectExigence(exigence, value) {
     var selectedExigence = this.state.selectedExigence;
+    var graphData = this.state.graphData;
 
     var position = this.isChecked(exigence);
     if(position > -1) {
       selectedExigence[position].note = value;
+      graphData[position].note = value;
     }
     else {
       selectedExigence.push({
         exigenceId: exigence.id,
         note: parseInt(value)
       });
+      graphData.push({
+        exigenceId: exigence.id,
+        reference: "REF." + exigence.reference,
+        note: parseInt(value)
+      });
     }
-    this.setState({selectedExigence: selectedExigence});
+    this.setState({selectedExigence: selectedExigence, graphData: graphData});
+  }
+
+  renderRadar() {
+
+    if(this.state.graphData.length <= 0)
+      return null;
+
+    var graphDomain = [];
+    var data = {};
+    var sets = [];
+    this.state.graphData.map((item, i) => {
+      graphDomain.push({
+        key: item.exigenceId,
+        label: item.reference
+      });
+      data[item.exigenceId] = item.note;
+    });
+    sets.push({
+      key: "resultat",
+      label: "Resultat",
+      values: data
+    });
+    return(
+      <div className="col-12 text-center" id="radar" ref={(node) => this.generateImage(node)}>
+        <Radar
+          width={500}
+          height={500}
+          padding={70}
+          domainMax={6}
+          data={{
+            variables: graphDomain,
+            sets: sets,
+          }}
+        />
+      </div>
+    );
+  }
+
+  generateImage(node) {
+    domtoimage.toPng(node, {
+      bgcolor: "#f8f8f8",
+      width: 571,
+      height: 500
+    })
+    .then(function (dataUrl) {
+        window.graphBase64 = dataUrl;
+    })
+    .catch(function (error) {
+        console.error('Erreur dans la generation de l\'image', error);
+    });
   }
 
   envoyer(e) {
     e.preventDefault();
+
     this.setState({loading: true});
     var services = new Services();
     services.addAnalyse(
       localStorage.getItem("utilisateurId"),
       window.normeId,
       this.state.selectedExigence,
+      window.graphBase64,
       (rapport) => {
         alert("Generé avec succes !");
         this.setState({loading: false, download: true, rapport: rapport});
       }
     );
+
   }
 
 
