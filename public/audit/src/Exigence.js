@@ -7,6 +7,13 @@ import Loading from "./Loading";
 import Services from "./Services";
 
 
+Array.prototype.contains = function ( responsable ) {
+   for (var i in this) {
+       if (this[i].id === responsable.id) return true;
+   }
+   return false;
+}
+
 export default class Clause extends Component {
 
   state = {
@@ -78,6 +85,49 @@ export default class Clause extends Component {
     if(this.state.download)
       return [];
     var exigenceDom = [];
+    var selectedResponsables = window.selectedResponsable;
+    var visitedExigence = [];
+    selectedResponsables.map((responsable, i) => {
+      exigenceDom.push(<div key={Math.floor(Math.random() * (i+1) )}><h2 style={{textAlign: "center", marginTop: 15}}>{responsable.titre}</h2><hr /></div>);
+      this.state.exigences.map((exigence, j) => {
+        if(exigence.responsables.contains(responsable) && !visitedExigence[exigence.id]) {
+          visitedExigence[exigence.id] = true;
+          exigenceDom.push(
+            <div className="row justify-content-center" key={i}>
+              <div className="col-md-6" style={{margin: "0 auto"}}>
+                <div className="box_general exigence_box" >
+                  <div className="form-group row" style={{marginBottom: 0}}>
+                    <div className="col-md-8 col-xs-12 vcenter">
+                      <label htmlFor={"exigence"+i}>
+                        <strong>{exigence.reference}</strong>: {exigence.libelle}
+                      </label>
+                    </div>
+                    <div className="offset-md-1 col-md-3 col-xs-12">
+                      <input
+                        type="number" style={{marginTop: 15}}
+                        min="0" max="6"
+                        className="form-control"
+                        id={"exigence"+i}
+                        onChange={(e) => this.selectExigence(exigence, e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+      });
+    });
+    return exigenceDom;
+  }
+
+/*
+  renderExigence() {
+    if(this.state.download)
+      return [];
+    var exigenceDom = [];
 
     this.state.exigences.map((exigence, i) => {
       exigenceDom.push(
@@ -107,7 +157,7 @@ export default class Clause extends Component {
     });
     return exigenceDom;
   }
-
+*/
   isChecked(exigence) {
     var checkedPosition = -1;
     var exigences = this.state.selectedExigence;
@@ -203,6 +253,7 @@ export default class Clause extends Component {
       window.normeId,
       this.state.selectedExigence,
       window.graphBase64,
+      window.client,
       (rapport) => {
         alert("Generé avec succes !");
         this.setState({loading: false, download: true, rapport: rapport});

@@ -45,7 +45,7 @@ export default class Clause extends Component {
 
     						<div className="step" data-state="branchtype">
     							<div className="question_title">
-    								<h3>ChOISIR LES CLAUSES</h3>
+    								<h3>CHOISIR LES CLAUSES</h3>
     								<p>Selectionner les clauses a <strong>utiliser</strong>.</p>
     							</div>
 

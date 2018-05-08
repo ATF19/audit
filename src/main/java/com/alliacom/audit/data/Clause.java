@@ -31,7 +31,9 @@ public class Clause implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(name = "norme_id")
     private Norme norme;
 
@@ -73,5 +75,15 @@ public class Clause implements Serializable {
 
     public void setNorme(Norme norme) {
         this.norme = norme;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this.hashCode() == obj.hashCode();
+    }
+
+    @Override
+    public int hashCode() {
+        return id.intValue();
     }
 }

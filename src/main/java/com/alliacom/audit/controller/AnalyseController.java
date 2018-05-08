@@ -66,6 +66,7 @@ public class AnalyseController {
         Long normeId = new Long((Integer) body.get("normeId"));
         Long utilisateurId = new Long((Integer) body.get("utilisateurId"));
         String graphe = (String) body.get("graphe");
+        String client = (String) body.get("client");
 
         Norme norme = normeRepository.findById(normeId)
                 .orElse(null);
@@ -107,6 +108,7 @@ public class AnalyseController {
 
         Rapport rapport = new Rapport(currentTime);
         rapport.setGrapheBase64(graphe);
+        rapport.setClient(client);
         rapport.generateGrapheImage();
         String fileName = rapport.create(datas);
 

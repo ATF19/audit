@@ -51,7 +51,7 @@ export default class Service {
     ;
   }
 
-  addAnalyse(utilisateurId, normeId, exigences, graphe, callback) {
+  addAnalyse(utilisateurId, normeId, exigences, graphe, client, callback) {
     fetch(Config.api+"/analyses", {
       headers: new Headers({
        'Authorization': 'Bearer '+ localStorage.getItem("token"),
@@ -62,7 +62,8 @@ export default class Service {
        normeId: parseInt(normeId),
        utilisateurId: parseInt(utilisateurId),
        exigences: exigences,
-       graphe: graphe
+       graphe: graphe,
+       client: client
      })
     })
     .then(response => response.json())

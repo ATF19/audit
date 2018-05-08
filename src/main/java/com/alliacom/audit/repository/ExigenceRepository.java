@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface ExigenceRepository extends JpaRepository<Exigence, Long> {
     List<Exigence> findDistinctByClauseInAndResponsablesIn(List<Clause> clause, List<Responsable> responsables);
+
 }

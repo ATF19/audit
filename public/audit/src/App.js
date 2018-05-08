@@ -7,6 +7,7 @@ import {
 import Login from "./Login";
 import Loading from "./Loading";
 import Services from "./Services";
+import Start from "./Start";
 import Body from "./Body";
 import Personnel from "./Personnel";
 import Clause from "./Clause";
@@ -14,6 +15,10 @@ import Exigence from "./Exigence";
 
 
 var steps = [
+  {
+    stepName: "Start",
+    component: Start
+  },
   {
     stepName: "Norme",
     component: Body

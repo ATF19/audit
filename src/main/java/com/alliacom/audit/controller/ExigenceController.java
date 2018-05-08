@@ -45,7 +45,6 @@ public class ExigenceController {
             List<Clause> clauses = clauseRepository.findAllById(clausesIds);
             List<Responsable> responsables = responsableRepository.findAllById(responsablesIds);
             list = exigenceRepository.findDistinctByClauseInAndResponsablesIn(clauses, responsables);
-
         }
         else {
             list = exigenceRepository.findAll();

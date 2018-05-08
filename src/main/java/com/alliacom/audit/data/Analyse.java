@@ -20,11 +20,15 @@ public class Analyse {
     @NotBlank
     private String rapport;
 
-    @ManyToOne
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(name = "utilisateur_id")
     private Utilisateur utilisateur;
 
-    @ManyToOne
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(name = "norme_id")
     private Norme norme;
 

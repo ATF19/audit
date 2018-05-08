@@ -34,7 +34,9 @@ public class Exigence {
     @LastModifiedDate
     private Date updatedAt;
 
-    @ManyToOne
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(name = "clause_id")
     private Clause clause;
 

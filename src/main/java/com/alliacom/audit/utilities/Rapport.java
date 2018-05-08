@@ -1,14 +1,20 @@
 package com.alliacom.audit.utilities;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Rapport {
 
@@ -17,6 +23,7 @@ public class Rapport {
     private String file_name_without_path;
     private String grapheBase64 = "";
     private byte[] graphe;
+    private String client;
 
     public Rapport(String name) {
         this.file_name_without_path = name + ".xls";
@@ -35,15 +42,36 @@ public class Rapport {
         int scoreTotal = 0;
         int rowNumber = 0;
 
+
+        Font font = workbook.createFont();
+        font.setColor(HSSFColor.WHITE.index);
+        font.setBold(true);
+
+        /* -- Cell style -- */
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+        cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        cellStyle.setFont(font);
+
+        /* --  Client info -- */
+        Row clientRow = sheet.createRow(rowNumber++);
+        Cell clientCellOne = clientRow.createCell(0);
+        Cell emptyCellOne = clientRow.createCell(1);
+        Cell emptyCellTwo = clientRow.createCell(2);
+        Cell clientCellTwo = clientRow.createCell(3);
+        clientCellOne.setCellValue("Client: ");
+        clientCellOne.setCellStyle(cellStyle);
+        emptyCellOne.setCellStyle(cellStyle);
+        emptyCellTwo.setCellStyle(cellStyle);
+        clientCellTwo.setCellValue(this.client);
+        clientCellTwo.setCellStyle(cellStyle);
+
         /* --  Header -- */
         Row header = sheet.createRow(rowNumber++);
         int headerColNumber = 0;
         for(Object headerTitle : headers) {
             Cell cell = header.createCell(headerColNumber++);
             cell.setCellValue((String) headerTitle);
-            CellStyle cellStyle = workbook.createCellStyle();
-            cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_GREEN.getIndex());
-            cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
             cell.setCellStyle(cellStyle);
         }
 
@@ -82,10 +110,6 @@ public class Rapport {
             Picture picture = drawing.createPicture(clientAnchor, pictureId);
             picture.resize();
         }
-
-        CellStyle cellStyle = workbook.createCellStyle();
-        cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_GREEN.getIndex());
-        cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         cell1.setCellStyle(cellStyle);
         cell2.setCellStyle(cellStyle);
 
@@ -108,7 +132,56 @@ public class Rapport {
         return file_name_without_path;
     }
 
+    /**
+     * Get data from excel file
+     * @return data map object
+     */
+    public Map<String, String> read() throws IOException, InvalidFormatException {
+        Map<String, String> datas = new HashMap<String ,String>();
 
+        /* Read sheet from xls file */
+        Workbook workbook = WorkbookFactory.create(new File(this.file_name));
+        Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+        while (sheetIterator.hasNext()) {
+            Sheet sheet = sheetIterator.next();
+        }
+        Sheet sheet = workbook.getSheetAt(0);
+
+        /* DataFormatter will help us convert each cell to its data type*/
+        DataFormatter dataFormatter = new DataFormatter();
+
+        /* Iterate over rows and cells */
+        int rowNumber = 0;
+        for (Row row: sheet) {
+            if(rowNumber == 0) {
+                Cell cell = row.getCell(3);
+                datas.put("client", dataFormatter.formatCellValue(cell));
+            }
+            else if(rowNumber != 1) {
+                Cell normeCell = row.getCell(0);
+                Cell referenceCell = row.getCell(1);
+                Cell exigenceCell = row.getCell(2);
+                Cell scoreCell = row.getCell(3);
+                String cellName = dataFormatter.formatCellValue(normeCell) + ": " + dataFormatter.formatCellValue(referenceCell) + " " + dataFormatter.formatCellValue(exigenceCell);
+                datas.put(cellName, dataFormatter.formatCellValue(scoreCell));
+            }
+            rowNumber++;
+        }
+
+        workbook.close();
+        return datas;
+    }
+
+    /**
+     * Update data in an excel file
+     */
+    public void update(Map<String, String> datas) {
+
+    }
+
+    /**
+     * Helper methods
+     */
     public void generateGrapheImage() {
         String encodingPrefix = "base64,";
         int contentStartIndex = grapheBase64.indexOf(encodingPrefix) + encodingPrefix.length();
@@ -146,5 +219,13 @@ public class Rapport {
 
     public void setGrapheBase64(String grapheBase64) {
         this.grapheBase64 = grapheBase64;
+    }
+
+    public String getClient() {
+        return client;
+    }
+
+    public void setClient(String client) {
+        this.client = client;
     }
 }
