@@ -1,8 +1,17 @@
 import React from 'react';
-import { List, Datagrid, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+import { Filter, ReferenceInput, SelectInput, List, Datagrid, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+
+const NormeFilter = (props) => (
+    <Filter {...props}>
+        <TextInput label="Recherche..." source="q" alwaysOn />
+        <ReferenceInput label="Norme" source="id" reference="normes">
+            <SelectInput optionText="norme" />
+        </ReferenceInput>
+    </Filter>
+);
 
 export const NormeList = (props) => (
-    <List {...props}>
+    <List {...props} filters={<NormeFilter />}>
         <Datagrid>
             <TextField source="id" label="#"/>
             <TextField source="organisation" label="Organisation" />

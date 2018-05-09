@@ -35,12 +35,12 @@ public class Exigence {
     private Date updatedAt;
 
     @ManyToOne(
-            cascade = CascadeType.ALL
+            cascade = CascadeType.REMOVE
     )
     @JoinColumn(name = "clause_id")
     private Clause clause;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.REMOVE)
     @JoinTable(
             name = "EXIGENCE_RESPONSABLE",
             joinColumns = @JoinColumn(name = "exigence_id", referencedColumnName = "id"),

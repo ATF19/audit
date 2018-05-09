@@ -21,13 +21,13 @@ public class Analyse {
     private String rapport;
 
     @ManyToOne(
-            cascade = CascadeType.ALL
+            cascade = CascadeType.REMOVE
     )
     @JoinColumn(name = "utilisateur_id")
     private Utilisateur utilisateur;
 
     @ManyToOne(
-            cascade = CascadeType.ALL
+            cascade = CascadeType.REMOVE
     )
     @JoinColumn(name = "norme_id")
     private Norme norme;

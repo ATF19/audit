@@ -32,7 +32,7 @@ public class Clause implements Serializable {
     private Date updatedAt;
 
     @ManyToOne(
-            cascade = CascadeType.ALL
+            cascade = CascadeType.REMOVE
     )
     @JoinColumn(name = "norme_id")
     private Norme norme;
