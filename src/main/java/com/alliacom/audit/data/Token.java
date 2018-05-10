@@ -31,6 +31,10 @@ public class Token {
     @Temporal(TemporalType.TIMESTAMP)
     private Date expireDate;
 
+    public void delete() {
+
+    }
+
     public Long getId() {
         return id;
     }

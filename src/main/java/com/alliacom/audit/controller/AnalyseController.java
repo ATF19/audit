@@ -10,6 +10,7 @@ import com.alliacom.audit.utilities.Rapport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,10 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -48,8 +46,31 @@ public class AnalyseController {
 
     @CrossOrigin
     @GetMapping("/analyses")
-    public List<Analyse> getAnalyses(HttpServletResponse response) {
-        List<Analyse> list = analyseRepository.findAll();
+    public List<Analyse> getAnalyses(HttpServletResponse response,
+                                     @RequestParam(value = "_sort") Optional<String> sortBy,
+                                     @RequestParam(value = "_order") Optional<String> orderDirection,
+                                     @RequestParam(value = "q") Optional<String> filter) {
+        List<Analyse> list = new ArrayList<>();
+
+        if(sortBy.isPresent()) {
+            Sort.Direction direction = Sort.Direction.ASC;
+            if(orderDirection.get().equalsIgnoreCase("DESC"))
+                direction = Sort.Direction.DESC;
+            list = analyseRepository.findAll(new Sort(direction, sortBy.get()));
+        }
+        else {
+            list = analyseRepository.findAll();
+        }
+
+        if(filter.isPresent()) {
+            List<Analyse> newList = new ArrayList<>();
+            for(int i=0; i<list.size(); i++) {
+                if(list.get(i).getUtilisateur().getEmail().toLowerCase().indexOf(filter.get().toLowerCase()) >= 0) {
+                    newList.add(list.get(i));
+                }
+            }
+            list = newList;
+        }
 
         /* This two headers are required in the admin-on-rest-client */
         response.addHeader("Access-Control-Expose-Headers", "X-Total-Count");
@@ -136,6 +157,7 @@ public class AnalyseController {
         Analyse analyse = analyseRepository.findById(analyseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Analyse", "id", analyseId));
 
+        analyse.delete();
         analyseRepository.delete(analyse);
 
         return analyse;

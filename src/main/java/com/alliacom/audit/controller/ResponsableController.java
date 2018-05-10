@@ -4,11 +4,14 @@ import com.alliacom.audit.data.Responsable;
 import com.alliacom.audit.exception.ResourceNotFoundException;
 import com.alliacom.audit.repository.ResponsableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -19,8 +22,25 @@ public class ResponsableController {
 
     @CrossOrigin
     @GetMapping("/responsables")
-    public List<Responsable> getAllResponsables(HttpServletResponse response) {
-        List<Responsable> list = responsableRepository.findAll();
+    public List<Responsable> getAllResponsables(HttpServletResponse response,
+                                                @RequestParam(value = "_sort") Optional<String> sortBy,
+                                                @RequestParam(value = "_order") Optional<String> orderDirection,
+                                                @RequestParam(value = "q") Optional<String> filter) {
+        List<Responsable> list = new ArrayList<>();
+
+        if(sortBy.isPresent()) {
+            Sort.Direction direction = Sort.Direction.ASC;
+            if(orderDirection.get().equalsIgnoreCase("DESC"))
+                direction = Sort.Direction.DESC;
+            list = responsableRepository.findAll(new Sort(direction, sortBy.get()));
+        }
+        else {
+            list = responsableRepository.findAll();
+        }
+
+        if(filter.isPresent()) {
+            list = responsableRepository.findAllByTitreContains(filter.get());
+        }
 
         /* This two headers are required in the admin-on-rest-client */
         response.addHeader("Access-Control-Expose-Headers", "X-Total-Count");
@@ -59,6 +79,7 @@ public class ResponsableController {
         Responsable responsable = responsableRepository.findById(responsableId)
                 .orElseThrow(() -> new ResourceNotFoundException("Responsable", "id", responsableId));
 
+        responsable.delete();
         responsableRepository.delete(responsable);
 
         return responsable;

@@ -7,6 +7,7 @@ import com.alliacom.audit.repository.TokenRepository;
 import com.alliacom.audit.repository.UtilisateurRepository;
 import com.alliacom.audit.utilities.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,25 @@ public class UtilisateurController {
 
     @CrossOrigin
     @GetMapping("/utilisateurs")
-    public List<Utilisateur> getAllUtilisateurs(HttpServletResponse response) {
-        List<Utilisateur> list = utilisateurRepository.findAll();
+    public List<Utilisateur> getAllUtilisateurs(HttpServletResponse response,
+                                                @RequestParam(value = "_sort") Optional<String> sortBy,
+                                                @RequestParam(value = "_order") Optional<String> orderDirection,
+                                                @RequestParam(value = "q") Optional<String> filter) {
+        List<Utilisateur> list = new ArrayList<>();
+
+        if(sortBy.isPresent()) {
+            Sort.Direction direction = Sort.Direction.ASC;
+            if(orderDirection.get().equalsIgnoreCase("DESC"))
+                direction = Sort.Direction.DESC;
+            list = utilisateurRepository.findAll(new Sort(direction, sortBy.get()));
+        }
+        else {
+            list = utilisateurRepository.findAll();
+        }
+
+        if(filter.isPresent()) {
+            list = utilisateurRepository.findAllByEmailContains(filter.get());
+        }
 
         /* This two headers are required in the admin-on-rest-client */
         response.addHeader("Access-Control-Expose-Headers", "X-Total-Count");
@@ -71,6 +89,7 @@ public class UtilisateurController {
         Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "id", utilisateurId));
 
+        utilisateur.delete();
         utilisateurRepository.delete(utilisateur);
 
         return utilisateur;

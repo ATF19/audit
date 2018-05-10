@@ -4,9 +4,6 @@ import { Filter, ReferenceInput, SelectInput, List, Datagrid, Edit, Create, Simp
 const NormeFilter = (props) => (
     <Filter {...props}>
         <TextInput label="Recherche..." source="q" alwaysOn />
-        <ReferenceInput label="Norme" source="id" reference="normes">
-            <SelectInput optionText="norme" />
-        </ReferenceInput>
     </Filter>
 );
 

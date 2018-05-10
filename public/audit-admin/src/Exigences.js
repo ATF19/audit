@@ -1,12 +1,18 @@
 import React from 'react';
-import { List, ReferenceInput, ReferenceField, SelectArrayInput, ReferenceArrayInput, required, SelectInput, Datagrid, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+import { Filter, List, ReferenceInput, ReferenceField, SelectArrayInput, ReferenceArrayInput, required, SelectInput, Datagrid, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+
+const ExigenceFilter = (props) => (
+    <Filter {...props}>
+        <TextInput label="Recherche par clause..." source="q" alwaysOn />
+    </Filter>
+);
 
 export const ExigenceList = (props) => (
-    <List {...props}>
+    <List {...props} filters={<ExigenceFilter />}>
         <Datagrid>
             <TextField source="id" label="#"/>
             <ReferenceField label="Clause" source="clause.id" reference="clauses">
-                <TextField source="id" />
+                <TextField source="libelle" label="Clause" />
             </ReferenceField>
             <TextField source="reference" label="Reference" />
             <TextField source="libelle" label="Libelle" />

@@ -10,6 +10,7 @@ import com.alliacom.audit.repository.ResponsableRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -34,9 +35,12 @@ public class ExigenceController {
     @GetMapping("/exigences")
     public List<Exigence> getAllExigences(HttpServletResponse response,
                                           @RequestParam(value = "responsables") Optional<List<Long>> responsablesIdsOptional,
-                                          @RequestParam(value = "clause") Optional<List<Long>> clausesIdsOptional) {
+                                          @RequestParam(value = "clause") Optional<List<Long>> clausesIdsOptional,
+                                          @RequestParam(value = "_sort") Optional<String> sortBy,
+                                          @RequestParam(value = "_order") Optional<String> orderDirection,
+                                          @RequestParam(value = "q") Optional<String> filter) {
 
-        List<Exigence> list;
+        List<Exigence> list = new ArrayList<>();
 
 
         if(responsablesIdsOptional.isPresent() && clausesIdsOptional.isPresent()) {
@@ -47,7 +51,25 @@ public class ExigenceController {
             list = exigenceRepository.findDistinctByClauseInAndResponsablesIn(clauses, responsables);
         }
         else {
-            list = exigenceRepository.findAll();
+            if(sortBy.isPresent()) {
+                Sort.Direction direction = Sort.Direction.ASC;
+                if(orderDirection.get().equalsIgnoreCase("DESC"))
+                    direction = Sort.Direction.DESC;
+                list = exigenceRepository.findAll(new Sort(direction, sortBy.get()));
+            }
+            else {
+                list = exigenceRepository.findAll();
+            }
+        }
+
+        if(filter.isPresent()) {
+            List<Exigence> newList = new ArrayList<>();
+            for(int i=0; i<list.size(); i++) {
+                if(list.get(i).getClause().getLibelle().toLowerCase().indexOf(filter.get().toLowerCase()) >= 0) {
+                    newList.add(list.get(i));
+                }
+            }
+            list = newList;
         }
 
         /* This two headers are required in the admin-on-rest-client */
@@ -122,6 +144,7 @@ public class ExigenceController {
         Exigence exigence = exigenceRepository.findById(exigenceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur", "id", exigenceId));
 
+        exigence.delete(exigenceRepository);
         exigenceRepository.delete(exigence);
 
         return exigence;

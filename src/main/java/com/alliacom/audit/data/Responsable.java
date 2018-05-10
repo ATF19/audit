@@ -31,6 +31,9 @@ public class Responsable {
     @LastModifiedDate
     private Date updatedAt;
 
+    public void delete() {
+
+    }
 
     public Long getId() {
         return id;

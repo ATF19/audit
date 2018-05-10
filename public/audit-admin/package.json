@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "admin-on-rest": "^1.4.0",
+    "aor-jsonapi-client": "^0.2.0",
     "aor-language-french": "^1.9.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",

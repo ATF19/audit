@@ -1,8 +1,14 @@
 import React from 'react';
-import { List, ReferenceInput, ReferenceField, required, SelectInput, Datagrid, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+import { Filter, List, ReferenceInput, ReferenceField, required, SelectInput, Datagrid, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+
+const ResponsableFilter = (props) => (
+    <Filter {...props}>
+        <TextInput label="Recherche par titre..." source="q" alwaysOn />
+    </Filter>
+);
 
 export const ResponsableList = (props) => (
-    <List {...props}>
+    <List {...props} filters={<ResponsableFilter />}>
         <Datagrid>
             <TextField source="id" label="#"/>
             <TextField source="titre" label="Titre" />

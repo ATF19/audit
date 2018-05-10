@@ -1,5 +1,7 @@
 package com.alliacom.audit.data;
 
+import com.alliacom.audit.repository.ExigenceRepository;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -35,6 +37,22 @@ public class Norme implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
+    @OneToMany(mappedBy = "norme", orphanRemoval=true)
+    @JsonIgnore
+    private List<Clause> clauses;
+
+    @OneToMany(mappedBy = "norme", orphanRemoval=true)
+    @JsonIgnore
+    private List<Analyse> analyses;
+
+    public void delete(ExigenceRepository exigenceRepository) {
+        for(Clause clause : clauses) {
+            clause.delete(exigenceRepository);
+        }
+
+        analyses.clear();
+        clauses.clear();
+    }
 
 
     public Long getId() {
@@ -77,5 +95,19 @@ public class Norme implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public List<Clause> getClauses() {
+        return clauses;
+    }
 
+    public void setClauses(List<Clause> clauses) {
+        this.clauses = clauses;
+    }
+
+    public List<Analyse> getAnalyses() {
+        return analyses;
+    }
+
+    public void setAnalyses(List<Analyse> analyses) {
+        this.analyses = analyses;
+    }
 }

@@ -1,8 +1,14 @@
 import React from 'react';
-import { List, ReferenceManyField, ReferenceInput, ReferenceField, required, SelectInput, Datagrid, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+import { Filter, List, ReferenceManyField, ReferenceInput, ReferenceField, required, SelectInput, Datagrid, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+
+const ClauseFilter = (props) => (
+    <Filter {...props}>
+        <TextInput label="Recherche par norme..." source="q" alwaysOn />
+    </Filter>
+);
 
 export const ClauseList = (props) => (
-    <List {...props}>
+    <List {...props} filters={<ClauseFilter />}>
         <Datagrid>
             <TextField source="id" label="#"/>
             <TextField source="norme.organisation" label="Organisation" />

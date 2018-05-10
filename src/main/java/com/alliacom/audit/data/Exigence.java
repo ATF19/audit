@@ -1,5 +1,6 @@
 package com.alliacom.audit.data;
 
+import com.alliacom.audit.repository.ExigenceRepository;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -47,6 +48,13 @@ public class Exigence {
             inverseJoinColumns = @JoinColumn(name = "responsable_id", referencedColumnName = "id")
     )
     private List<Responsable> responsables;
+
+    public void delete(ExigenceRepository exigenceRepository) {
+        for(Responsable responsable : responsables) {
+            exigenceRepository.supprimerExigenceResponsableRelation(id, responsable.getId());
+        }
+        responsables.clear();
+    }
 
     public Long getId() {
         return id;

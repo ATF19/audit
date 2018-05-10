@@ -1,8 +1,14 @@
 import React from 'react';
-import { List, Datagrid, RadioButtonGroupInput, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+import { Filter, List, Datagrid, RadioButtonGroupInput, Edit, Create, SimpleForm, DateField, TextField, EditButton, DisabledInput, TextInput, LongTextInput, DateInput } from 'admin-on-rest';
+
+const UtilisateurFilter = (props) => (
+    <Filter {...props}>
+        <TextInput label="Recherche par email..." source="q" alwaysOn />
+    </Filter>
+);
 
 export const UtilisateurList = (props) => (
-    <List {...props}>
+    <List {...props} filters={<UtilisateurFilter />}>
         <Datagrid>
             <TextField source="id" label="#"/>
             <TextField source="email" label="Email" />
