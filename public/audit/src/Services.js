@@ -51,6 +51,30 @@ export default class Service {
     ;
   }
 
+  getAnalyses(callback) {
+    fetch(Config.api+"/analyses/byUser/"+localStorage.getItem("utilisateurId"), {
+      headers: new Headers({
+       'Authorization': 'Bearer '+ localStorage.getItem("token"),
+       'Content-Type': 'application/json'
+     })
+    })
+    .then(response => response.json())
+    .then(response => callback(response))
+    ;
+  }
+
+  getAnalyseResult(id, callback) {
+    fetch(Config.api+"/analyse/getResult/"+id, {
+      headers: new Headers({
+       'Authorization': 'Bearer '+ localStorage.getItem("token"),
+       'Content-Type': 'application/json'
+     })
+    })
+    .then(response => response.json())
+    .then(response => callback(response))
+    ;
+  }
+
   addAnalyse(utilisateurId, normeId, exigences, graphe, client, callback) {
     fetch(Config.api+"/analyses", {
       headers: new Headers({
@@ -60,6 +84,26 @@ export default class Service {
      method: 'POST',
      body: JSON.stringify({
        normeId: parseInt(normeId),
+       utilisateurId: parseInt(utilisateurId),
+       exigences: exigences,
+       graphe: graphe,
+       client: client
+     })
+    })
+    .then(response => response.json())
+    .then(({ rapport }) => callback(rapport))
+    ;
+  }
+
+  updateAnalyse(analyseId, utilisateurId, norme, exigences, graphe, client, callback) {
+    fetch(Config.api+"/analyses/update/"+analyseId, {
+      headers: new Headers({
+       'Authorization': 'Bearer '+ localStorage.getItem("token"),
+       'Content-Type': 'application/json'
+     }),
+     method: 'POST',
+     body: JSON.stringify({
+       norme: norme,
        utilisateurId: parseInt(utilisateurId),
        exigences: exigences,
        graphe: graphe,

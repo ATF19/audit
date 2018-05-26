@@ -7,6 +7,7 @@ import com.alliacom.audit.repository.ExigenceRepository;
 import com.alliacom.audit.repository.NormeRepository;
 import com.alliacom.audit.repository.UtilisateurRepository;
 import com.alliacom.audit.utilities.Rapport;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -77,6 +79,45 @@ public class AnalyseController {
         response.addHeader("X-Total-Count", String.valueOf(list.size()));
 
         return list;
+    }
+
+    @CrossOrigin
+    @GetMapping("/analyses/byUser/{userId}")
+    public List<Analyse> getAnalysesByEmail(HttpServletResponse response,
+                                            @PathVariable(value = "userId") Long userId) {
+        List<Analyse> list = new ArrayList<>();
+
+        list = analyseRepository.analysesByUserId(userId);
+
+        /* This two headers are required in the admin-on-rest-client */
+        response.addHeader("Access-Control-Expose-Headers", "X-Total-Count");
+        response.addHeader("X-Total-Count", String.valueOf(list.size()));
+
+        return list;
+    }
+
+
+    @CrossOrigin
+    @GetMapping("/analyse/getResult/{id}")
+    public ResponseEntity<?> getAnalyseResult(@PathVariable(value = "id") Long id) {
+        Analyse analyse = analyseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Analyse", "id", id));
+   	
+	String rapportName = analyse.getRapport().replace(".xls", "");
+        Rapport rapport = new Rapport(rapportName);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = rapport.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InvalidFormatException e) {
+            e.printStackTrace();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json; charset=UTF-8");
+
+        return new ResponseEntity<Map<String, Object>>(result, headers, HttpStatus.OK);
     }
 
     @CrossOrigin
@@ -149,6 +190,70 @@ public class AnalyseController {
         return new ResponseEntity<Map<String, String>>(responseObject, headers, HttpStatus.OK);
     }
 
+
+    @CrossOrigin
+    @PostMapping("/analyses/update/{id}")
+    public @ResponseBody
+    ResponseEntity updateAnalyseRapport(@Valid @RequestBody Map<String, Object> body,
+                                        @PathVariable(value = "id") Long analyseId) {
+
+        Long utilisateurId = new Long((Integer) body.get("utilisateurId"));
+        String graphe = (String) body.get("graphe");
+        String client = (String) body.get("client");
+
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
+                .orElse(null);
+        Analyse analyse = analyseRepository.findById(analyseId)
+                .orElse(new Analyse());
+
+        String normeName = (String) body.get("norme");
+
+
+        List<Map<String, Object>> exigences = (List<Map<String, Object>>) body.get("exigences");
+
+        int datasLength = exigences.size();
+        Object[][] datas = new Object[datasLength][];
+        int datasCounter = 0;
+
+
+        for(int i=0; i<datasLength; i++) {
+            Map<String, Object> element = exigences.get(i);
+            String libelle = (String) element.get("libelle");
+	    String reference = (String) element.get("reference");
+	    int note;
+	    if (element.get("score") instanceof String)
+		note = Integer.valueOf((String) element.get("score"));
+	    else
+	    	note = (Integer) element.get("score");
+
+            Object[] line = {
+                    normeName,
+                    reference,
+                    libelle,
+                    note
+            };
+
+            datas[datasCounter] = line;
+            datasCounter++;
+
+        }
+
+        String rapportName = analyse.getRapport().replace(".xls", "");
+
+        Rapport rapport = new Rapport(rapportName);
+        rapport.setGrapheBase64(graphe);
+        rapport.setClient(client);
+        rapport.generateGrapheImage();
+        String fileName = rapport.create(datas);
+
+
+        Map<String, String> responseObject = new HashMap<String ,String>();
+        responseObject.put("rapport", analyse.getRapport());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json; charset=UTF-8");
+
+        return new ResponseEntity<Map<String, String>>(responseObject, headers, HttpStatus.OK);
+    }
 
     @CrossOrigin
     @DeleteMapping("/analyses/{id}")

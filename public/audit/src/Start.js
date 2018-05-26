@@ -22,6 +22,8 @@ export default class Start extends Component {
                       placeholder="Nom..."
                       onChange={(e) => this.change(e.target.value)} />
                   </div>
+
+
     						</div>
 
     						</div>
@@ -35,6 +37,10 @@ export default class Start extends Component {
 
   change(client) {
     window.client = client;
+  }
+
+  modifier(e) {
+    e.preventDefault();
   }
 
 }

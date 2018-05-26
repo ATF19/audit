@@ -14,13 +14,15 @@ Array.prototype.contains = function ( responsable ) {
    return false;
 }
 
-export default class Clause extends Component {
+export default class AnalyseResult extends Component {
 
   state = {
     loading: true,
     exigences: [],
     selectedExigence: [],
     graphData: [],
+    client: "",
+    norme: "",
     loaded: false,
     download: false,
     rapport: ""
@@ -28,18 +30,18 @@ export default class Clause extends Component {
 
 
   componentWillUpdate() {
-    if(window.selectedNorme && window.selectedResponsable && window.selectedClause && !this.state.loaded) {
+    if(window.selectedAnalyse && !this.state.loaded) {
       var services = new Services();
-      var responsablesIds = "";
-      var clausesIds = "";
-      window.selectedResponsable.map((responsable) => {
-        responsablesIds += responsable.id+",";
-      });
-      window.selectedClause.map((clause) => {
-        clausesIds += clause.id+",";
-      });
-      services.getExigences(clausesIds, responsablesIds, (data) => {
-        this.setState({exigences: data, loading: false, loaded: true});
+      services.getAnalyseResult(window.selectedAnalyse.id, (data) => {
+        var graphData = [];
+        data.exigences.map((exigence, i) => {
+          graphData.push({
+            exigenceId: i,
+            reference: "REF." + exigence.reference,
+            score: parseInt(exigence.score)
+          });
+        });
+        this.setState({exigences: data.exigences, selectedExigence: data.exigences, graphData: graphData, client: data.client, norme: data.norme, loading: false, loaded: true});
       })
     }
   }
@@ -85,51 +87,8 @@ export default class Clause extends Component {
     if(this.state.download)
       return [];
     var exigenceDom = [];
-    var selectedResponsables = window.selectedResponsable;
-    var visitedExigence = [];
-    selectedResponsables.map((responsable, i) => {
-      exigenceDom.push(<div key={Math.floor(Math.random() * (i+1) )}><h2 style={{textAlign: "center", marginTop: 15}}>{responsable.titre}</h2><hr /></div>);
-      this.state.exigences.map((exigence, j) => {
-        if(exigence.responsables.contains(responsable) && !visitedExigence[exigence.id]) {
-          visitedExigence[exigence.id] = true;
-          exigenceDom.push(
-            <div className="row justify-content-center" key={i}>
-              <div className="col-md-6" style={{margin: "0 auto"}}>
-                <div className="box_general exigence_box" >
-                  <div className="form-group row" style={{marginBottom: 0}}>
-                    <div className="col-md-8 col-xs-12 vcenter">
-                      <label htmlFor={"exigence"+i}>
-                        <strong>{exigence.reference}</strong>: {exigence.libelle}
-                      </label>
-                    </div>
-                    <div className="offset-md-1 col-md-3 col-xs-12">
-                      <input
-                        type="number" style={{marginTop: 15}}
-                        min="0" max="6"
-                        className="form-control"
-                        id={"exigence"+i}
-                        onChange={(e) => this.selectExigence(exigence, e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        }
 
-      });
-    });
-    return exigenceDom;
-  }
-
-/*
-  renderExigence() {
-    if(this.state.download)
-      return [];
-    var exigenceDom = [];
-
-    this.state.exigences.map((exigence, i) => {
+    this.state.selectedExigence.map((exigence, i) => {
       exigenceDom.push(
         <div className="row justify-content-center" key={i}>
           <div className="col-md-6" style={{margin: "0 auto"}}>
@@ -146,6 +105,7 @@ export default class Clause extends Component {
                     min="0" max="6"
                     className="form-control"
                     id={"exigence"+i}
+                    value={exigence.score}
                     onChange={(e) => this.selectExigence(exigence, e.target.value)}
                   />
                 </div>
@@ -157,12 +117,12 @@ export default class Clause extends Component {
     });
     return exigenceDom;
   }
-*/
+
   isChecked(exigence) {
     var checkedPosition = -1;
     var exigences = this.state.selectedExigence;
     for(var i=0; i < exigences.length; i++) {
-      if(exigences[i].exigenceId == exigence.id) {
+      if(exigences[i].reference == exigence.reference) {
         checkedPosition = i;
         break;
       }
@@ -176,18 +136,18 @@ export default class Clause extends Component {
 
     var position = this.isChecked(exigence);
     if(position > -1) {
-      selectedExigence[position].note = parseInt(value);
-      graphData[position].note = parseInt(value);
+      selectedExigence[position].score = parseInt(value);
+      graphData[position].score = parseInt(value);
     }
     else {
       selectedExigence.push({
         exigenceId: exigence.id,
-        note: parseInt(value)
+        score: parseInt(value)
       });
       graphData.push({
         exigenceId: exigence.id,
         reference: "REF." + exigence.reference,
-        note: parseInt(value)
+        score: parseInt(value)
       });
     }
     this.setState({selectedExigence: selectedExigence, graphData: graphData});
@@ -203,10 +163,10 @@ export default class Clause extends Component {
     var sets = [];
     this.state.graphData.map((item, i) => {
       graphDomain.push({
-        key: item.exigenceId,
+        key: i,
         label: item.reference
       });
-      data[item.exigenceId] = item.note;
+      data[item.exigenceId] = item.score;
     });
     sets.push({
       key: "resultat",
@@ -248,12 +208,13 @@ export default class Clause extends Component {
 
     this.setState({loading: true});
     var services = new Services();
-    services.addAnalyse(
+    services.updateAnalyse(
+      window.selectedAnalyse.id,
       localStorage.getItem("utilisateurId"),
-      window.normeId,
+      this.state.norme,
       this.state.selectedExigence,
       window.graphBase64,
-      window.client,
+      this.state.client,
       (rapport) => {
         alert("Generé avec succes !");
         this.setState({loading: false, download: true, rapport: rapport});

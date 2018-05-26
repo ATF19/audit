@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class Rapport {
 
@@ -136,8 +134,9 @@ public class Rapport {
      * Get data from excel file
      * @return data map object
      */
-    public Map<String, String> read() throws IOException, InvalidFormatException {
-        Map<String, String> datas = new HashMap<String ,String>();
+    public Map<String, Object> read() throws IOException, InvalidFormatException {
+        Map<String, Object> datas = new HashMap<>();
+        List<Object> exigences = new ArrayList<>();
 
         /* Read sheet from xls file */
         Workbook workbook = WorkbookFactory.create(new File(this.file_name));
@@ -162,21 +161,132 @@ public class Rapport {
                 Cell referenceCell = row.getCell(1);
                 Cell exigenceCell = row.getCell(2);
                 Cell scoreCell = row.getCell(3);
-                String cellName = dataFormatter.formatCellValue(normeCell) + ": " + dataFormatter.formatCellValue(referenceCell) + " " + dataFormatter.formatCellValue(exigenceCell);
-                datas.put(cellName, dataFormatter.formatCellValue(scoreCell));
+
+                //String cellName = dataFormatter.formatCellValue(normeCell) + ": " + dataFormatter.formatCellValue(referenceCell) + " " + dataFormatter.formatCellValue(exigenceCell);
+                //datas.put(cellName, dataFormatter.formatCellValue(scoreCell));
+
+                if(!datas.containsKey("norme"))
+                    datas.put("norme", dataFormatter.formatCellValue(normeCell));
+
+                // Ignore the score total line
+                if(!dataFormatter.formatCellValue(exigenceCell).equalsIgnoreCase("SCORE TOTAL")) {
+                    Map<String, String> exigenceObject = new HashMap<>();
+                    exigenceObject.put("reference", dataFormatter.formatCellValue(referenceCell));
+                    exigenceObject.put("libelle", dataFormatter.formatCellValue(exigenceCell));
+                    exigenceObject.put("score", dataFormatter.formatCellValue(scoreCell));
+
+                    exigences.add(exigenceObject);
+                }
+
+
             }
             rowNumber++;
         }
-
+        datas.put("exigences", exigences);
         workbook.close();
         return datas;
     }
 
     /**
      * Update data in an excel file
+     * @return file_name
      */
-    public void update(Map<String, String> datas) {
+    public String update(Object[][] datas) {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Rapport");
+        Object[] headers = {"Norme", "Reference", "Exigence", "Score"};
 
+        int scoreTotal = 0;
+        int rowNumber = 0;
+
+
+        Font font = workbook.createFont();
+        font.setColor(HSSFColor.WHITE.index);
+        font.setBold(true);
+
+        /* -- Cell style -- */
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setFillBackgroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+        cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        cellStyle.setFont(font);
+
+        /* --  Client info -- */
+        Row clientRow = sheet.createRow(rowNumber++);
+        Cell clientCellOne = clientRow.createCell(0);
+        Cell emptyCellOne = clientRow.createCell(1);
+        Cell emptyCellTwo = clientRow.createCell(2);
+        Cell clientCellTwo = clientRow.createCell(3);
+        clientCellOne.setCellValue("Client: ");
+        clientCellOne.setCellStyle(cellStyle);
+        emptyCellOne.setCellStyle(cellStyle);
+        emptyCellTwo.setCellStyle(cellStyle);
+        clientCellTwo.setCellValue(this.client);
+        clientCellTwo.setCellStyle(cellStyle);
+
+        /* --  Header -- */
+        Row header = sheet.createRow(rowNumber++);
+        int headerColNumber = 0;
+        for(Object headerTitle : headers) {
+            Cell cell = header.createCell(headerColNumber++);
+            cell.setCellValue((String) headerTitle);
+            cell.setCellStyle(cellStyle);
+        }
+
+        /* --  Body -- */
+        for(Object[] data : datas) {
+            int colNumber = 0;
+            Row row = sheet.createRow(rowNumber++);
+            for(Object field : data) {
+                Cell cell = row.createCell(colNumber++);
+                if (field instanceof String) {
+                    cell.setCellValue((String) field);
+                } else if (field instanceof Integer) {
+                    cell.setCellValue((Integer) field);
+                    scoreTotal += (Integer) field;
+                }
+            }
+        }
+
+        /* --  Footer -- */
+        Row footer = sheet.createRow(rowNumber++);
+        int footerColNumber = 2;
+
+        Cell cell1 = footer.createCell(footerColNumber++);
+        cell1.setCellValue("SCORE TOTAL");
+
+        Cell cell2 = footer.createCell(footerColNumber++);
+        cell2.setCellValue(scoreTotal);
+
+        if(graphe.length > 0) {
+            int pictureId = workbook.addPicture(graphe, Workbook.PICTURE_TYPE_PNG);
+            Drawing drawing = sheet.createDrawingPatriarch();
+            CreationHelper creationHelper = workbook.getCreationHelper();
+            ClientAnchor clientAnchor = creationHelper.createClientAnchor();
+            clientAnchor.setCol1(5);
+            clientAnchor.setRow1(1);
+            Picture picture = drawing.createPicture(clientAnchor, pictureId);
+            picture.resize();
+        }
+        cell1.setCellStyle(cellStyle);
+        cell2.setCellStyle(cellStyle);
+
+
+        /* -- Basic XLS Configuration -- */
+        sheet.autoSizeColumn(0);
+        sheet.autoSizeColumn(2);
+
+        /* --  Save the file -- */
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file_name, false);
+            workbook.write(outputStream);
+            workbook.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return file_name_without_path;
     }
 
     /**
