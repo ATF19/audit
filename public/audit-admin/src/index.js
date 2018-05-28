@@ -5,6 +5,7 @@ import frenchMessages from 'aor-language-french';
 
 import { NormeList, NormeEdit, NormeCreate, NormeIcon } from './Normes';
 import { ClauseList, ClauseEdit, ClauseCreate, ClauseIcon } from './Clauses';
+import { QuestionnaireList, QuestionnaireEdit, QuestionnaireCreate, QuestionnaireIcon } from './Questionnaires';
 import { UtilisateurList, UtilisateurEdit, UtilisateurCreate, UtilisateurIcon } from './Utilisateurs';
 import { AnalyseList, analyseIcon } from './Analyses';
 import { ExigenceList, ExigenceEdit, ExigenceCreate, ExigenceIcon } from './Exigences';
@@ -37,6 +38,7 @@ render(
       <Resource name="clauses" list={ClauseList} edit={ClauseEdit} create={ClauseCreate} remove={Delete} />
       <Resource name="exigences" list={ExigenceList} edit={ExigenceEdit} create={ExigenceCreate} remove={Delete} />
       <Resource name="responsables" list={ResponsableList} edit={ResponsableEdit} create={ResponsableCreate} remove={Delete} />
+      <Resource name="questionnaires" list={QuestionnaireList} edit={QuestionnaireEdit} create={QuestionnaireCreate} remove={Delete} />
       <Resource name="utilisateurs" list={UtilisateurList} edit={UtilisateurEdit} create={UtilisateurCreate} remove={Delete} />
       <Resource name="analyses" list={AnalyseList} />
     </Admin>,

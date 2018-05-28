@@ -39,6 +39,18 @@ export default class Service {
     ;
   }
 
+  getQuestionnaires(responsableId, callback) {
+    fetch(Config.api+"/questionnaires/byResponsable/"+responsableId, {
+      headers: new Headers({
+       'Authorization': 'Bearer '+ localStorage.getItem("token"),
+       'Content-Type': 'application/json'
+     })
+    })
+    .then(response => response.json())
+    .then(response => callback(response))
+    ;
+  }
+
   getExigences(clause, responsables, callback) {
     fetch(Config.api+"/exigences?clause="+clause+"&responsables="+responsables, {
       headers: new Headers({

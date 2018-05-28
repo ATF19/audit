@@ -32,15 +32,17 @@ export default class Clause extends Component {
       var services = new Services();
       var responsablesIds = "";
       var clausesIds = "";
-      window.selectedResponsable.map((responsable) => {
+      window.selectedResponsable.map((responsable, i) => {
         responsablesIds += responsable.id+",";
+        window.selectedResponsable[i].questionnaire=[];
+        services.getQuestionnaires(responsable.id, (quest) => window.selectedResponsable[i].questionnaire = quest);
       });
       window.selectedClause.map((clause) => {
         clausesIds += clause.id+",";
       });
       services.getExigences(clausesIds, responsablesIds, (data) => {
         this.setState({exigences: data, loading: false, loaded: true});
-      })
+      });
     }
   }
 
@@ -88,13 +90,27 @@ export default class Clause extends Component {
     var selectedResponsables = window.selectedResponsable;
     var visitedExigence = [];
     selectedResponsables.map((responsable, i) => {
-      exigenceDom.push(<div key={Math.floor(Math.random() * (i+1) )}><h2 style={{textAlign: "center", marginTop: 15}}>{responsable.titre}</h2><hr /></div>);
+      exigenceDom.push(
+        <div key={Math.floor(Math.random() * (i+25) )} style={{marginTop: 90}}>
+          <h2 style={{textAlign: "center", marginTop: 15}}>{responsable.titre}</h2>
+          <hr />
+       </div>);
+
+       if(responsable.questionnaire.length > 0) {
+        responsable.questionnaire.map((quest, k) => {
+          exigenceDom.push(
+            <div className="col-md-3">
+              <p style={{display: 'inline'}}>{quest.question}</p>
+            </div>
+          );
+        });
+       }
+       
       this.state.exigences.map((exigence, j) => {
         if(exigence.responsables.contains(responsable) && !visitedExigence[exigence.id]) {
           visitedExigence[exigence.id] = true;
           exigenceDom.push(
-            <div className="row justify-content-center" key={i}>
-              <div className="col-md-6" style={{margin: "0 auto"}}>
+              <div className="col-md-6" style={{margin: "0 auto"}} key={j}>
                 <div className="box_general exigence_box" >
                   <div className="form-group row" style={{marginBottom: 0}}>
                     <div className="col-md-8 col-xs-12 vcenter">
@@ -114,7 +130,6 @@ export default class Clause extends Component {
                   </div>
                 </div>
               </div>
-            </div>
           );
         }
 
