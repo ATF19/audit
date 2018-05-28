@@ -58,10 +58,12 @@ export default class Clause extends Component {
     					<input id="website" name="website" type="text" value="" />
     					<div id="middle-wizard">
 
-    						<div className="step" data-state="branchtype">
 
-    							{this.renderExigence()}
-                  <div id="bottom-wizard">
+	    	<div className="step" data-state="branchtype">
+
+   							{this.renderExigence()}
+
+	    	<div id="bottom-wizard">
                     {
                       this.state.download ?
                         <div>
@@ -90,27 +92,28 @@ export default class Clause extends Component {
     var selectedResponsables = window.selectedResponsable;
     var visitedExigence = [];
     selectedResponsables.map((responsable, i) => {
+      var exigenceDomRow = [];
       exigenceDom.push(
         <div key={Math.floor(Math.random() * (i+25) )} style={{marginTop: 90}}>
           <h2 style={{textAlign: "center", marginTop: 15}}>{responsable.titre}</h2>
           <hr />
        </div>);
-
+       var questionnaireDomRow = [];
        if(responsable.questionnaire.length > 0) {
         responsable.questionnaire.map((quest, k) => {
-          exigenceDom.push(
-            <div className="col-md-3">
+          questionnaireDomRow.push(
+            <div className="col-md-12" style={{marginBottom: 20}}>
               <p style={{display: 'inline'}}>{quest.question}</p>
             </div>
           );
         });
        }
-       
+
       this.state.exigences.map((exigence, j) => {
         if(exigence.responsables.contains(responsable) && !visitedExigence[exigence.id]) {
           visitedExigence[exigence.id] = true;
-          exigenceDom.push(
-              <div className="col-md-6" style={{margin: "0 auto"}} key={j}>
+          exigenceDomRow.push(
+              <div className="col-md-12" style={{margin: "0 auto"}} key={j}>
                 <div className="box_general exigence_box" >
                   <div className="form-group row" style={{marginBottom: 0}}>
                     <div className="col-md-8 col-xs-12 vcenter">
@@ -134,6 +137,12 @@ export default class Clause extends Component {
         }
 
       });
+      exigenceDom.push(
+        <div className="row">
+          <div className="col-md-3 col-xs-12">{questionnaireDomRow}</div>
+          <div className="col-md-7 col-xs-12">{exigenceDomRow}</div>
+        </div>
+      );
     });
     return exigenceDom;
   }
