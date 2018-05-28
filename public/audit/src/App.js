@@ -52,10 +52,10 @@ export default class App extends Component {
         		<div className="container-fluid">
         		    <div className="row">
                         <div className="col-10 text-center">
-                              <h6 style={{marginRight: -200}}><a><img src="logo.png" alt="" style={{height: 45}}/></a></h6>
+                              <h6 style={{marginRight: -200}}><a href="/"><img src="logo.png" alt="" style={{height: 45}}/></a></h6>
                         </div>
                         <div className="col-2 text-right vcenter">
-                          <a href="#" onClick={this.logout} style={{fontSize: 22}}>Deconnecter</a>
+                          <a href="/" onClick={this.logout} style={{fontSize: 22}}>Deconnecter</a>
                         </div>
                     </div>
         		</div>

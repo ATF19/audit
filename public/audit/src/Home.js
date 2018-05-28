@@ -16,7 +16,7 @@ export default class Home extends Component {
     					<div id="middle-wizard">
               <div className="row">
                       <div className="col-12 text-center">
-                            <h6><a><img src="logo.png" alt="" style={{height: 70}}/></a></h6>
+                            <h6><a href="/"><img src="logo.png" alt="" style={{height: 70}}/></a></h6>
                       </div>
                   </div>
                   <div className="row" style={{marginTop: 50}}>
