@@ -7,7 +7,7 @@ export default class Start extends Component {
       <main>
     		<div className="container">
     			<div id="wizard_container">
-    				<form name="example-1" id="wrapped" method="POST">
+    				<form name="example-1" id="wrapped" method="POST" onSubmit={(e) => e.preventDefault()}>
     					<div id="middle-wizard">
 
     						<div className="step" data-state="branchtype">
@@ -19,7 +19,7 @@ export default class Start extends Component {
                   <div className="col-md-6" style={{margin: "0 auto", marginTop: 50}}>
                     <input className="form-control"
                       type="text"
-                      placeholder="Nom..."
+                      placeholder="Nom..."                    
                       onChange={(e) => this.change(e.target.value)} />
                   </div>
 

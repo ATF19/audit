@@ -113,10 +113,11 @@ export default class Clause extends Component {
         if(exigence.responsables.contains(responsable) && !visitedExigence[exigence.id]) {
           visitedExigence[exigence.id] = true;
           exigenceDomRow.push(
-              <div className="col-md-12" style={{margin: "0 auto"}} key={j}>
+              <div className="row">
+              <div className="col-md-8" key={j}>
                 <div className="box_general exigence_box" >
                   <div className="form-group row" style={{marginBottom: 0}}>
-                    <div className="col-md-8 col-xs-12 vcenter">
+                    <div className="col-md-9 col-xs-12 vcenter">
                       <label htmlFor={"exigence"+i}>
                         <strong>{exigence.reference}</strong>: {exigence.libelle}
                       </label>
@@ -133,6 +134,15 @@ export default class Clause extends Component {
                   </div>
                 </div>
               </div>
+              <div className="col-md-4 col-xs-12">
+                <input
+                  type="text" style={{marginTop: 15}}
+                  className="form-control"
+                  id={"note_exigence"+i}
+                  placeholder="Remarques..."
+                />
+              </div>
+              </div>
           );
         }
 
@@ -140,7 +150,7 @@ export default class Clause extends Component {
       exigenceDom.push(
         <div className="row">
           <div className="col-md-3 col-xs-12">{questionnaireDomRow}</div>
-          <div className="col-md-7 col-xs-12">{exigenceDomRow}</div>
+          <div className="col-md-9 col-xs-12">{exigenceDomRow}</div>
         </div>
       );
     });
