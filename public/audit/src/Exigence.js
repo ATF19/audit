@@ -110,11 +110,11 @@ export default class Clause extends Component {
        }
 
       this.state.exigences.map((exigence, j) => {
-        if(exigence.responsables.contains(responsable) && !visitedExigence[exigence.id]) {
+        if(exigence.responsables.contains(responsable)) {
           visitedExigence[exigence.id] = true;
           exigenceDomRow.push(
-              <div className="row">
-              <div className="col-md-8" key={j}>
+              <div className="row" key={j*(i+1)}>
+              <div className="col-md-8">
                 <div className="box_general exigence_box" >
                   <div className="form-group row" style={{marginBottom: 0}}>
                     <div className="col-md-9 col-xs-12 vcenter">
@@ -127,8 +127,9 @@ export default class Clause extends Component {
                         type="number" style={{marginTop: 15}}
                         min="0" max="6"
                         className="form-control"
-                        id={"exigence"+i}
-                        onChange={(e) => this.selectExigence(exigence, e.target.value)}
+                        id={"exigence"+j}
+                        value={exigence.note}
+                        onChange={(e) => this.selectExigence(exigence, e.target.value, j)}
                       />
                     </div>
                   </div>
@@ -204,10 +205,12 @@ export default class Clause extends Component {
     return checkedPosition;
   }
 
-  selectExigence(exigence, value) {
+  selectExigence(exigence, value, position) {
     var selectedExigence = this.state.selectedExigence;
     var graphData = this.state.graphData;
-
+    var exigences = this.state.exigences;
+    exigence.note = value;
+    exigences[position] = exigence;
     var position = this.isChecked(exigence);
     if(position > -1) {
       selectedExigence[position].note = parseInt(value);
@@ -224,7 +227,7 @@ export default class Clause extends Component {
         note: parseInt(value)
       });
     }
-    this.setState({selectedExigence: selectedExigence, graphData: graphData});
+    this.setState({selectedExigence: selectedExigence, graphData: graphData, exigences: exigences});
   }
 
   renderRadar() {
