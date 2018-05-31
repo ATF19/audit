@@ -18,4 +18,9 @@ public interface ExigenceRepository extends JpaRepository<Exigence, Long> {
     @Transactional
     @Query(value = "DELETE FROM exigence_responsable WHERE exigence_id = :exigenceId AND responsable_id = :responsableId", nativeQuery = true)
     void supprimerExigenceResponsableRelation(@Param("exigenceId") Long exigenceId, @Param("responsableId") Long responsableId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM exigence_responsable WHERE responsable_id = :responsableId", nativeQuery = true)
+    void supprimerResponsables(@Param("responsableId") Long responsableId);
 }

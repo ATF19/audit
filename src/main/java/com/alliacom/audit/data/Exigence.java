@@ -23,6 +23,7 @@ public class Exigence {
     private String reference;
 
     @NotBlank
+    @Column(columnDefinition = "TEXT")
     private String libelle;
 
     @Column(nullable = false, updatable = false)
@@ -36,7 +37,7 @@ public class Exigence {
     private Date updatedAt;
 
     @ManyToOne(
-            cascade = CascadeType.REMOVE
+            cascade = CascadeType.DETACH
     )
     @JoinColumn(name = "clause_id")
     private Clause clause;

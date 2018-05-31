@@ -39,12 +39,17 @@ public class Utilisateur implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
-    @OneToMany(mappedBy = "utilisateur", orphanRemoval=true)
+    @OneToMany(mappedBy = "utilisateur", orphanRemoval = true)
     @JsonIgnore
     private List<Analyse> analyses;
 
+    @OneToMany(mappedBy = "utilisateur", orphanRemoval = true)
+    @JsonIgnore
+    private List<Token> tokens;
+
     public void delete() {
         analyses.clear();
+        tokens.clear();
     }
 
     public Utilisateur() {
@@ -111,6 +116,14 @@ public class Utilisateur implements Serializable {
 
     public void setAnalyses(List<Analyse> analyses) {
         this.analyses = analyses;
+    }
+
+    public List<Token> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(List<Token> tokens) {
+        this.tokens = tokens;
     }
 
     public boolean login(Utilisateur utilisateur) {

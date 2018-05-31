@@ -37,11 +37,11 @@ public class Norme implements Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
-    @OneToMany(mappedBy = "norme", orphanRemoval=true)
+    @OneToMany(mappedBy = "norme", orphanRemoval = true)
     @JsonIgnore
     private List<Clause> clauses;
 
-    @OneToMany(mappedBy = "norme", orphanRemoval=true)
+    @OneToMany(mappedBy = "norme", orphanRemoval = true)
     @JsonIgnore
     private List<Analyse> analyses;
 

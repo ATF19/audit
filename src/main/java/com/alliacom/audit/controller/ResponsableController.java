@@ -2,6 +2,8 @@ package com.alliacom.audit.controller;
 
 import com.alliacom.audit.data.Responsable;
 import com.alliacom.audit.exception.ResourceNotFoundException;
+import com.alliacom.audit.repository.ExigenceRepository;
+import com.alliacom.audit.repository.QuestionnaireRepository;
 import com.alliacom.audit.repository.ResponsableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -19,6 +21,12 @@ public class ResponsableController {
 
     @Autowired
     ResponsableRepository responsableRepository;
+
+    @Autowired
+    QuestionnaireRepository questionnaireRepository;
+
+    @Autowired
+    ExigenceRepository exigenceRepository;
 
     @CrossOrigin
     @GetMapping("/responsables")
@@ -79,7 +87,7 @@ public class ResponsableController {
         Responsable responsable = responsableRepository.findById(responsableId)
                 .orElseThrow(() -> new ResourceNotFoundException("Responsable", "id", responsableId));
 
-        responsable.delete();
+        responsable.delete(questionnaireRepository, exigenceRepository);
         responsableRepository.delete(responsable);
 
         return responsable;

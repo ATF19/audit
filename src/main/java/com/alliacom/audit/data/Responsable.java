@@ -1,5 +1,7 @@
 package com.alliacom.audit.data;
 
+import com.alliacom.audit.repository.ExigenceRepository;
+import com.alliacom.audit.repository.QuestionnaireRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -37,7 +39,12 @@ public class Responsable {
     @LastModifiedDate
     private Date updatedAt;
 
-    public void delete() {
+    public void delete(QuestionnaireRepository questionnaireRepository, ExigenceRepository exigenceRepository) {
+        for(Questionnaire questionnaire : questionnaires) {
+            questionnaireRepository.delete(questionnaire);
+        }
+        questionnaires.clear();
+        exigenceRepository.supprimerResponsables(id);
 
     }
 

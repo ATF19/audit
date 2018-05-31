@@ -32,7 +32,7 @@ public class Token {
     private Date expireDate;
 
     public void delete() {
-
+        utilisateur = null;
     }
 
     public Long getId() {

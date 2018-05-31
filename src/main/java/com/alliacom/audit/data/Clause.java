@@ -35,12 +35,12 @@ public class Clause implements Serializable {
     private Date updatedAt;
 
     @ManyToOne(
-            cascade = CascadeType.REMOVE
+            cascade = CascadeType.DETACH
     )
     @JoinColumn(name = "norme_id")
     private Norme norme;
 
-    @OneToMany(mappedBy = "clause", orphanRemoval=true)
+    @OneToMany(mappedBy = "clause", orphanRemoval = true)
     @JsonIgnore
     private List<Exigence> exigences;
 
